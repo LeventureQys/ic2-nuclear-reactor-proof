@@ -10,6 +10,30 @@ from matplotlib.gridspec import GridSpec
 import numpy as np
 from typing import Dict, Optional
 import os
+import platform
+
+
+# 配置中文字体
+def setup_chinese_font():
+    """配置 matplotlib 中文字体"""
+    system = platform.system()
+
+    if system == "Windows":
+        # Windows 系统使用微软雅黑
+        plt.rcParams['font.sans-serif'] = ['Microsoft YaHei', 'SimHei', 'Arial Unicode MS']
+    elif system == "Darwin":  # macOS
+        # macOS 使用苹方或黑体
+        plt.rcParams['font.sans-serif'] = ['PingFang SC', 'Heiti SC', 'Arial Unicode MS']
+    else:  # Linux
+        # Linux 尝试使用常见的中文字体
+        plt.rcParams['font.sans-serif'] = ['WenQuanYi Micro Hei', 'Droid Sans Fallback', 'DejaVu Sans']
+
+    # 解决负号显示问题
+    plt.rcParams['axes.unicode_minus'] = False
+
+
+# 在模块加载时配置字体
+setup_chinese_font()
 
 
 class ReactorVisualizer:
@@ -116,7 +140,8 @@ class ReactorVisualizer:
         """绘制热量分布图"""
         heat_map = reactor.get_heat_percentage_map()
 
-        im = ax.imshow(heat_map, cmap=self.colormap, aspect='auto',
+        # 使用更直观的配色方案：蓝色（冷）-> 绿色 -> 黄色 -> 红色（热）
+        im = ax.imshow(heat_map, cmap='RdYlGn_r', aspect='auto',
                       vmin=0, vmax=100, interpolation='nearest')
 
         # 添加数值标注
@@ -124,8 +149,10 @@ class ReactorVisualizer:
             for j in range(reactor.cols):
                 component = reactor.grid[i][j]
                 if component.max_heat > 0:
+                    # 根据温度选择文字颜色，确保可读性
+                    text_color = 'white' if heat_map[i, j] > 50 else 'black'
                     text = ax.text(j, i, f'{heat_map[i, j]:.0f}%',
-                                 ha="center", va="center", color="white",
+                                 ha="center", va="center", color=text_color,
                                  fontsize=8, fontweight='bold')
 
         ax.set_xticks(range(reactor.cols))
@@ -236,6 +263,14 @@ class ReactorVisualizer:
             'hull_heat': []
         }
 
+        # 保存绘图对象以便更新（避免重复创建）
+        self.plot_objects = {
+            'power_line': None,
+            'heat_line': None,
+            'heat_img': None,
+            'tick_text': None
+        }
+
         # 注册回调
         def update_callback(reactor, result, history):
             self._update_realtime_plots(reactor, history)
@@ -246,34 +281,63 @@ class ReactorVisualizer:
         plt.show()
 
     def _update_realtime_plots(self, reactor, history: Dict):
-        """更新实时图表"""
+        """更新实时图表（优化版本）"""
+        current_tick = history['ticks'][-1] if history['ticks'] else 0
+
         # 更新功率曲线
         ax = self.axes['power']
-        ax.clear()
-        ax.plot(history['ticks'], history['power'], 'b-', linewidth=2)
-        ax.set_xlabel('时间 (tick)')
-        ax.set_ylabel('功率 (EU/t)')
-        ax.set_title('实时发电功率')
-        ax.grid(True, alpha=0.3)
+        if self.plot_objects['power_line'] is None:
+            # 首次创建
+            ax.clear()
+            self.plot_objects['power_line'], = ax.plot(history['ticks'], history['power'], 'b-', linewidth=2)
+            ax.set_xlabel('时间 (tick)')
+            ax.set_ylabel('功率 (EU/t)')
+            ax.set_title(f'实时发电功率 | Tick: {current_tick}')
+            ax.grid(True, alpha=0.3)
+        else:
+            # 更新数据
+            self.plot_objects['power_line'].set_data(history['ticks'], history['power'])
+            ax.relim()
+            ax.autoscale_view()
+            ax.set_title(f'实时发电功率 | Tick: {current_tick}')
 
         # 更新堆温曲线
         ax = self.axes['heat']
-        ax.clear()
-        ax.plot(history['ticks'], history['hull_heat'], 'r-', linewidth=2)
-        ax.set_xlabel('时间 (tick)')
-        ax.set_ylabel('堆温 (HU)')
-        ax.set_title('实时堆温')
-        ax.grid(True, alpha=0.3)
+        if self.plot_objects['heat_line'] is None:
+            # 首次创建
+            ax.clear()
+            self.plot_objects['heat_line'], = ax.plot(history['ticks'], history['hull_heat'], 'r-', linewidth=2)
+            ax.set_xlabel('时间 (tick)')
+            ax.set_ylabel('堆温 (HU)')
+            ax.set_title(f'实时堆温 | 当前: {reactor.hull_heat:.1f} HU')
+            ax.grid(True, alpha=0.3)
+        else:
+            # 更新数据
+            self.plot_objects['heat_line'].set_data(history['ticks'], history['hull_heat'])
+            ax.relim()
+            ax.autoscale_view()
+            ax.set_title(f'实时堆温 | 当前: {reactor.hull_heat:.1f} HU')
 
-        # 更新热量分布
+        # 更新热量分布（这个需要重绘）
         ax = self.axes['distribution']
         ax.clear()
         heat_map = reactor.get_heat_percentage_map()
-        im = ax.imshow(heat_map, cmap=self.colormap, aspect='auto',
+        im = ax.imshow(heat_map, cmap='RdYlGn_r', aspect='auto',
                       vmin=0, vmax=100, interpolation='nearest')
-        ax.set_title('热量分布')
+        ax.set_title(f'热量分布 | Tick: {current_tick}')
 
-        plt.pause(0.01)
+        # 添加简化的数值标注（只显示有热量的格子）
+        for i in range(reactor.rows):
+            for j in range(reactor.cols):
+                if heat_map[i, j] > 0:
+                    text_color = 'white' if heat_map[i, j] > 50 else 'black'
+                    ax.text(j, i, f'{heat_map[i, j]:.0f}%',
+                           ha="center", va="center", color=text_color,
+                           fontsize=7)
+
+        # 使用更快的刷新方式
+        self.fig.canvas.draw_idle()
+        self.fig.canvas.flush_events()
 
 
 class ReportGenerator:
