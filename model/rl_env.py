@@ -226,11 +226,14 @@ class ReactorEnvV2(gym.Env):
         reward = 0.0
 
         if exploded:
-            reward = -1000.0
-            reward += avg_power * 0.1
+            # 降低爆炸惩罚，鼓励探索高功率设计
+            reward = -500.0
+            reward += avg_power * 0.2
         else:
-            reward = avg_power * 1.0
+            # 提高功率权重，更重视发电量
+            reward = avg_power * 1.5
 
+            # 保持严格的堆温安全限制
             heat_ratio = max_heat / self.max_hull_heat
             if heat_ratio > 0.9:
                 reward -= 200 * (heat_ratio - 0.9)
@@ -240,8 +243,8 @@ class ReactorEnvV2(gym.Env):
             if ticks_run >= self.simulation_ticks:
                 reward += 50.0
 
-            if heat_ratio < 0.5 and avg_power > 100:
-                reward += 100.0
+            # 删除低温奖励，避免过度散热
+            # 旧代码: if heat_ratio < 0.5 and avg_power > 100: reward += 100.0
 
         return reward
 

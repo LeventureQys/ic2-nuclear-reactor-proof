@@ -14,7 +14,7 @@ from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import DummyVecEnv
 import logging
 
-from model.rl_env import ReactorEnv
+from model.rl_env import ReactorEnvV2 as ReactorEnv
 
 # 配置日志
 logging.basicConfig(

@@ -5,12 +5,12 @@ import argparse
 from stable_baselines3 import PPO
 from stable_baselines3.common.vec_env import DummyVecEnv
 from stable_baselines3.common.monitor import Monitor
-from model.rl_env import ReactorEnv
+from model.rl_env import ReactorEnvV2
 import numpy as np
 
 
 def make_env(simulation_ticks=1000):
-    env = ReactorEnv(rows=9, cols=6, max_hull_heat=10000, simulation_ticks=simulation_ticks)
+    env = ReactorEnvV2(rows=9, cols=6, max_hull_heat=10000, simulation_ticks=simulation_ticks)
     return Monitor(env)
 
 
@@ -43,7 +43,7 @@ def evaluate_model(model_path, n_episodes=10, simulation_ticks=1000):
 
             # 调试：打印前几个动作
             if step < 5:
-                component_name = ReactorEnv.AVAILABLE_COMPONENTS[action[0]]
+                component_name = ReactorEnvV2.AVAILABLE_COMPONENTS[action[0]]
                 print(f"  步骤 {step+1}: 动作={action[0]} ({component_name})")
 
             obs, reward, done, info = env.step(action)
