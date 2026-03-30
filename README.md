@@ -1,16 +1,16 @@
-# IC2 核反应堆模拟器 ⚛️
+# IC2 核反应堆模拟器
 
 这是一个用于模拟 Minecraft 工业2（IC2）核反应堆运行的完整系统。如果你曾经在游戏中因为反应堆设计不当而导致爆炸，或者想在实际建造前验证设计的可行性，这个工具可以帮到你。
 
-**🆕 现已支持强化学习！** 让 AI 自动学习设计最优的核反应堆配置。详见 [强化学习扩展](#强化学习扩展-)
+现已支持强化学习！让 AI 自动学习设计最优的核反应堆配置。详见下方的强化学习扩展部分。
 
 ## 项目特色
 
-- ✅ **完整物理模拟**：实现 IC2 核反应堆的所有核心机制
-- 📊 **实时可视化**：发电曲线、温度监控、热量分布一目了然
-- ⚙️ **灵活配置**：YAML 配置文件，无需修改代码
-- 📈 **详细分析**：自动生成报告和 CSV 数据导出
-- 🤖 **AI 设计**：强化学习自动优化反应堆配置
+- 完整物理模拟：实现 IC2 核反应堆的所有核心机制
+- 实时可视化：发电曲线、温度监控、热量分布一目了然
+- 灵活配置：YAML 配置文件，无需修改代码
+- 详细分析：自动生成报告和 CSV 数据导出
+- AI 设计：强化学习自动优化反应堆配置
 
 ## 项目背景
 
@@ -20,54 +20,54 @@
 
 ### 基础模拟
 
-1. **安装依赖**
+1. 安装依赖
 ```bash
 pip install -r requirements.txt
 ```
 
-2. **运行第一个模拟**
+2. 运行第一个模拟
 ```bash
 python examples/basic_simulation.py
 ```
 
-输出文件（在 `output/` 目录）：
-- `reactor_analysis.png` - 综合分析图表
-- `simulation_report.txt` - 详细文本报告
-- `simulation_data.csv` - 原始数据
+输出文件会保存在 output 目录：
+- reactor_analysis.png - 综合分析图表
+- simulation_report.txt - 详细文本报告
+- simulation_data.csv - 原始数据
 
-3. **实时可视化**
+3. 实时可视化
 ```bash
 python examples/realtime_simulation.py
 ```
 
-4. **对比多个设计**
+4. 对比多个设计
 ```bash
 python examples/comparison_analysis.py
 ```
 
 ### 强化学习（AI 自动设计）
 
-1. **测试环境**
+1. 测试环境
 ```bash
 python test_rl_env.py
 ```
 
-2. **训练 AI**
+2. 训练 AI
 ```bash
 python rl_train.py --algorithm PPO --timesteps 100000
 ```
 
-3. **监控训练**
+3. 监控训练
 ```bash
 tensorboard --logdir rl_logs
 ```
 
-4. **评估模型**
+4. 评估模型
 ```bash
 python rl_evaluate.py rl_models/PPO_xxx/best/best_model.zip
 ```
 
-详细文档：[RL_README.md](RL_README.md)
+详细文档：RL_README.md
 
 ## 项目结构
 
@@ -81,22 +81,22 @@ ic2-nuclear-reactor-proof/
 │   ├── reactor.py               # 反应堆主类
 │   ├── simulation.py            # 模拟引擎
 │   ├── visualization.py         # 可视化系统
-│   └── rl_env.py                # 强化学习环境 🆕
+│   └── rl_env.py                # 强化学习环境（新增）
 ├── examples/                    # 示例脚本
 │   ├── basic_simulation.py      # 基础模拟示例
 │   ├── realtime_simulation.py   # 实时可视化示例
 │   └── comparison_analysis.py   # 配置对比示例
 ├── documents/                   # 文档
 │   └── IC2_Reactor_Info.md      # IC2 反应堆机制说明
-├── rl_train.py                  # 强化学习训练脚本 🆕
-├── rl_evaluate.py               # 强化学习评估脚本 🆕
-├── test_rl_env.py               # 环境测试脚本 🆕
+├── rl_train.py                  # 强化学习训练脚本（新增）
+├── rl_evaluate.py               # 强化学习评估脚本（新增）
+├── test_rl_env.py               # 环境测试脚本（新增）
 ├── output/                      # 输出目录（自动创建）
-├── rl_models/                   # 训练模型目录（自动创建）🆕
-├── rl_logs/                     # 训练日志目录（自动创建）🆕
+├── rl_models/                   # 训练模型目录（自动创建）
+├── rl_logs/                     # 训练日志目录（自动创建）
 ├── requirements.txt             # Python 依赖
 ├── README.md                    # 本文件
-└── RL_README.md                 # 强化学习详细文档 🆕
+└── RL_README.md                 # 强化学习详细文档（新增）
 ```
 
 ## 配置文件详解
@@ -138,22 +138,22 @@ visualization:
 | 代码 | 组件名称 | 说明 |
 |------|---------|------|
 | E | 空格 | 空槽位 |
-| **燃料棒** |||
+| 燃料棒 |||
 | U | 单铀棒 | 基础燃料，发电 5 EU/t |
 | D | 双联燃料棒 | 2倍效率 |
 | Q | 四联燃料棒 | 4倍效率 |
-| **散热片** |||
+| 散热片 |||
 | H | 散热片 | 基础散热 6 HU/tick |
 | R | 反应堆散热片 | 吸收堆温 5 HU/tick |
 | C | 元件散热片 | 散发相邻元件热量 |
 | A | 高级散热片 | 高效散热 12 HU/tick |
 | O | 超频散热片 | 最强散热 20 HU/tick |
-| **热交换器** |||
+| 热交换器 |||
 | HE | 热交换器 | 热量交换 |
 | RH | 反应堆热交换器 | 与堆温交换 |
 | CH | 元件热交换器 | 元件间交换 |
 | AH | 高级热交换器 | 高效交换 |
-| **其他** |||
+| 其他 |||
 | N | 中子反射板 | 增加发电效率 |
 | TN | 加厚中子反射板 | 高耐久反射板 |
 | C10 | 10k冷却单元 | 热量缓冲 10000 HU |
@@ -185,7 +185,7 @@ visualization:
 - 高级散热片：12 HU/tick
 - 超频散热片：20 HU/tick
 
-**关键：散热能力 ≥ 产热量，否则反应堆会持续升温直至爆炸（10000 HU）**
+关键：散热能力必须大于等于产热量，否则反应堆会持续升温直至爆炸（10000 HU）
 
 ## 使用示例
 
@@ -240,10 +240,10 @@ python examples/basic_simulation.py --config rl_results/best_design_config.yaml
 ## 输出结果
 
 ### 可视化图表
-- **发电功率曲线**：显示功率随时间变化，包含平均值
-- **堆温曲线**：监控反应堆温度，标注爆炸阈值
-- **热量分布图**：热力图显示各组件温度百分比
-- **累计发电量**：总发电量随时间增长
+- 发电功率曲线：显示功率随时间变化，包含平均值
+- 堆温曲线：监控反应堆温度，标注爆炸阈值
+- 热量分布图：热力图显示各组件温度百分比
+- 累计发电量：总发电量随时间增长
 
 ### 文本报告
 - 性能统计：总发电量、平均功率、最大功率
@@ -256,27 +256,27 @@ python examples/basic_simulation.py --config rl_results/best_design_config.yaml
 ## 常见问题
 
 ### Q: 反应堆总是爆炸怎么办？
-**A:** 散热系统不足
+A: 散热系统不足
 - 查看热量分布图，找出高温区域
 - 在高温区域增加散热片
 - 减少燃料棒数量或密度
 - 使用热交换器转移热量
 
 ### Q: 发电量太低怎么办？
-**A:** 优化燃料棒布局
+A: 优化燃料棒布局
 - 增加燃料棒数量
 - 让燃料棒紧密排列（增加核脉冲交互）
 - 使用中子反射板提升效率
 - 使用双联或四联燃料棒
 
 ### Q: 中子反射板很快损坏？
-**A:** 耐久消耗过快
+A: 耐久消耗过快
 - 使用加厚中子反射板（4倍耐久）
 - 减少反射板周围的燃料棒数量
 - 避免四联燃料棒紧邻反射板
 
 ### Q: 如何提高训练效果？
-**A:** 调整强化学习参数
+A: 调整强化学习参数
 - 增加训练步数（如 500k）
 - 使用更多并行环境（8-16个）
 - 调整奖励函数权重
@@ -291,17 +291,17 @@ python examples/basic_simulation.py --config rl_results/best_design_config.yaml
 - IC2 官方 Wiki：https://wiki.industrial-craft.net/
 - documents/IC2_Reactor_Info.md：本项目整理的详细机制说明文档
 
-## 强化学习扩展 🤖
+## 强化学习扩展
 
 本项目支持使用强化学习训练 AI 自动设计最优核反应堆配置。
 
 ### 核心特性
 
-- **自动优化**：AI 学习如何放置组件以最大化发电量
-- **安全保障**：智能控制温度，避免反应堆爆炸
-- **多种算法**：支持 PPO、A2C、DQN 等主流算法
-- **实时监控**：TensorBoard 可视化训练过程
-- **配置导出**：将 AI 设计导出为 YAML 文件
+- 自动优化：AI 学习如何放置组件以最大化发电量
+- 安全保障：智能控制温度，避免反应堆爆炸
+- 多种算法：支持 PPO、A2C、DQN 等主流算法
+- 实时监控：TensorBoard 可视化训练过程
+- 配置导出：将 AI 设计导出为 YAML 文件
 
 ### 快速开始
 
@@ -333,13 +333,13 @@ python rl_train.py \
 
 ### 奖励机制
 
-- **主要奖励**：平均发电功率（EU/t）
-- **爆炸惩罚**：-1000 分
-- **温度惩罚**：温度越高惩罚越大
-- **稳定奖励**：完整运行 +50 分
-- **效率奖励**：低温高功率 +100 分
+- 主要奖励：平均发电功率（EU/t）
+- 爆炸惩罚：-1000 分
+- 温度惩罚：温度越高惩罚越大
+- 稳定奖励：完整运行 +50 分
+- 效率奖励：低温高功率 +100 分
 
-详细文档：[RL_README.md](RL_README.md)
+详细文档：RL_README.md
 
 ## 注意事项
 
