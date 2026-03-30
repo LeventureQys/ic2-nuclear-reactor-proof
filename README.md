@@ -47,27 +47,22 @@ python examples/comparison_analysis.py
 
 ### 强化学习（AI 自动设计）
 
-1. 测试环境
+1. 训练 AI
 ```bash
-python test_rl_env.py
+python rl_train.py --timesteps 200000 --n-envs 4
 ```
 
-2. 训练 AI
-```bash
-python rl_train.py --algorithm PPO --timesteps 100000
-```
-
-3. 监控训练
+2. 监控训练
 ```bash
 tensorboard --logdir rl_logs
 ```
 
-4. 评估模型
+3. 评估模型
 ```bash
-python rl_evaluate.py rl_models/PPO_xxx/best/best_model.zip
+python evaluate_model.py rl_models/PPO_xxx/best/best_model.zip --n-episodes 20
 ```
 
-详细文档：RL_README.md
+详细文档：[documents/RL_Tutorial.md](documents/RL_Tutorial.md)
 
 ## 项目结构
 
@@ -87,16 +82,15 @@ ic2-nuclear-reactor-proof/
 │   ├── realtime_simulation.py   # 实时可视化示例
 │   └── comparison_analysis.py   # 配置对比示例
 ├── documents/                   # 文档
-│   └── IC2_Reactor_Info.md      # IC2 反应堆机制说明
-├── rl_train.py                  # 强化学习训练脚本（新增）
-├── rl_evaluate.py               # 强化学习评估脚本（新增）
-├── test_rl_env.py               # 环境测试脚本（新增）
+│   ├── IC2_Reactor_Info.md      # IC2 反应堆机制说明
+│   └── RL_Tutorial.md           # 强化学习教程
+├── rl_train.py                  # 强化学习训练脚本
+├── evaluate_model.py            # 模型评估脚本
 ├── output/                      # 输出目录（自动创建）
 ├── rl_models/                   # 训练模型目录（自动创建）
 ├── rl_logs/                     # 训练日志目录（自动创建）
 ├── requirements.txt             # Python 依赖
-├── README.md                    # 本文件
-└── RL_README.md                 # 强化学习详细文档（新增）
+└── README.md                    # 本文件
 ```
 
 ## 配置文件详解
@@ -228,13 +222,10 @@ for tick in range(1000):
 
 ```bash
 # 训练 AI
-python rl_train.py --timesteps 100000
+python rl_train.py --timesteps 200000 --n-envs 4
 
-# 评估并导出最佳设计
-python rl_evaluate.py rl_models/PPO_xxx/best/best_model.zip
-
-# 使用 AI 设计的配置
-python examples/basic_simulation.py --config rl_results/best_design_config.yaml
+# 评估最佳模型
+python evaluate_model.py rl_models/PPO_xxx/best/best_model.zip --n-episodes 20
 ```
 
 ## 输出结果
@@ -297,49 +288,44 @@ A: 调整强化学习参数
 
 ### 核心特性
 
-- 自动优化：AI 学习如何放置组件以最大化发电量
-- 安全保障：智能控制温度，避免反应堆爆炸
-- 多种算法：支持 PPO、A2C、DQN 等主流算法
-- 实时监控：TensorBoard 可视化训练过程
-- 配置导出：将 AI 设计导出为 YAML 文件
+- **自动优化**：AI 学习如何放置组件以最大化发电量
+- **安全保障**：智能控制温度，避免反应堆爆炸
+- **简化动作空间**：只需选择组件类型，位置自动填充
+- **实时监控**：TensorBoard 可视化训练过程
 
 ### 快速开始
 
 ```bash
-# 1. 测试环境
-python test_rl_env.py
+# 1. 训练 AI（使用 PPO 算法）
+python rl_train.py --timesteps 200000 --n-envs 4
 
-# 2. 训练 AI（推荐使用 PPO）
-python rl_train.py --algorithm PPO --timesteps 100000
-
-# 3. 监控训练过程
+# 2. 监控训练过程
 tensorboard --logdir rl_logs
 
-# 4. 评估最佳模型
-python rl_evaluate.py rl_models/PPO_xxx/best/best_model.zip
+# 3. 评估最佳模型
+python evaluate_model.py rl_models/PPO_xxx/best/best_model.zip --n-episodes 20
 ```
 
 ### 训练参数
 
 ```bash
 python rl_train.py \
-    --algorithm PPO \           # 算法：PPO, A2C, DQN
-    --timesteps 500000 \        # 训练步数
-    --n-envs 8 \                # 并行环境数
+    --timesteps 200000 \        # 训练步数（推荐 200k-500k）
+    --n-envs 4 \                # 并行环境数（4-8个）
     --learning-rate 3e-4 \      # 学习率
-    --simulation-ticks 2000 \   # 每次评估的 tick 数
-    --device cuda               # 使用 GPU 加速
+    --simulation-ticks 1000 \   # 每次评估的 tick 数
+    --eval-freq 10000           # 评估频率
 ```
 
-### 奖励机制
+### 工作原理
 
-- 主要奖励：平均发电功率（EU/t）
-- 爆炸惩罚：-1000 分
-- 温度惩罚：温度越高惩罚越大
-- 稳定奖励：完整运行 +50 分
-- 效率奖励：低温高功率 +100 分
+AI 通过强化学习自动学习反应堆设计：
+1. **动作空间**：每步选择一个组件类型（18种）
+2. **位置填充**：按从左到右、从上到下的顺序自动填充
+3. **奖励机制**：根据发电量、温度、稳定性计算奖励
+4. **学习过程**：通过试错不断优化设计策略
 
-详细文档：RL_README.md
+详细教程：[documents/RL_Tutorial.md](documents/RL_Tutorial.md)
 
 ## 注意事项
 
