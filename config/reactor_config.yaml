@@ -1,0 +1,74 @@
+# IC2 核反应堆配置文件
+# 反应堆布局：9行6列（54格）
+# 组件类型代码：
+#   E: 空格 (Empty)
+#   U: 单铀棒 (Uranium Cell)
+#   D: 双联燃料棒 (Dual Uranium Cell)
+#   Q: 四联燃料棒 (Quad Uranium Cell)
+#   H: 散热片 (Heat Vent)
+#   R: 反应堆散热片 (Reactor Heat Vent)
+#   C: 元件散热片 (Component Heat Vent)
+#   A: 高级散热片 (Advanced Heat Vent)
+#   O: 超频散热片 (Overclocked Heat Vent)
+#   HE: 热交换器 (Heat Exchanger)
+#   RH: 反应堆热交换器 (Reactor Heat Exchanger)
+#   CH: 元件热交换器 (Component Heat Exchanger)
+#   AH: 高级热交换器 (Advanced Heat Exchanger)
+#   N: 中子反射板 (Neutron Reflector)
+#   TN: 加厚中子反射板 (Thick Neutron Reflector)
+#   C10: 10k冷却单元 (10k Coolant Cell)
+#   C30: 30k冷却单元 (30k Coolant Cell)
+#   C60: 60k冷却单元 (60k Coolant Cell)
+
+# 反应堆名称
+reactor_name: "示例反应堆 - 高效稳定型"
+
+# 反应堆布局（9行6列）
+# 每行代表反应堆的一行，从上到下
+layout:
+  - ["E", "E", "E", "E", "E", "E"]
+  - ["E", "U", "H", "U", "H", "E"]
+  - ["E", "H", "C60", "C60", "H", "E"]
+  - ["E", "U", "H", "U", "H", "E"]
+  - ["E", "E", "E", "E", "E", "E"]
+  - ["E", "O", "O", "O", "O", "E"]
+  - ["E", "R", "R", "R", "R", "E"]
+  - ["E", "E", "E", "E", "E", "E"]
+  - ["E", "E", "E", "E", "E", "E"]
+
+# 模拟参数
+simulation:
+  # 模拟时长（tick）
+  duration: 10000
+  # 时间步长（tick）
+  time_step: 1
+  # 模拟速度倍率（用于可视化）
+  speed_multiplier: 1.0
+  # 数据采样间隔（tick）
+  sample_interval: 20
+
+# 可视化参数
+visualization:
+  # 是否启用实时可视化
+  enable_realtime: true
+  # 更新间隔（tick）
+  update_interval: 100
+  # 图表类型
+  charts:
+    - power_output      # 发电功率曲线
+    - heat_distribution # 热量分布图
+    - reactor_heat      # 反应堆本体温度
+    - component_status  # 组件状态
+  # 温度颜色映射
+  temperature_colormap: "hot"
+  # 图表保存路径
+  output_dir: "output"
+
+# 反应堆物理参数
+reactor_parameters:
+  # 反应堆本体最大热量（无隔板）
+  max_hull_heat: 10000
+  # 爆炸阈值
+  explosion_threshold: 10000
+  # 环境温度
+  ambient_temperature: 0
